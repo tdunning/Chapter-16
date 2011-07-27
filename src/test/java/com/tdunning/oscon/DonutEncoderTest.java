@@ -20,23 +20,6 @@ public class DonutEncoderTest {
   private static final Splitter onComma = Splitter.on(",").trimResults(CharMatcher.anyOf("\"\' "));
 
   @Test
-  public void testAddToVector() throws IOException {
-    List<String> lines = Resources.readLines(Resources.getResource("donut.csv"), Charsets.UTF_8);
-    DonutEncoder encoder = new DonutEncoder(onComma.split(lines.get(0)), ImmutableList.<String>of("x", "y", "shape", "k"));
-    Vector v = new RandomAccessSparseVector(40);
-    assertEquals(0, v.norm(0), 1e-9);
-    encoder.addToVector(onComma.split(lines.get(1)), v);
-    assertEquals(6, v.norm(0), 1e-9);
-    assertEquals(4.936827227473259, v.norm(1), 1e-9);
-
-    v = new RandomAccessSparseVector(40);
-    assertEquals(0, v.norm(0), 1e-9);
-    encoder.addToVector(onComma.split(lines.get(2)), v);
-    assertEquals(6, v.norm(0), 1e-9);
-    assertEquals(5.620153406634927, v.norm(1), 1e-9);
-  }
-
-  @Test
   public void testSingleColumn() throws IOException {
     List<String> lines = Resources.readLines(Resources.getResource("donut.csv"), Charsets.UTF_8);
     DonutEncoder encoder = new DonutEncoder(onComma.split(lines.get(0)), ImmutableList.<String>of("y"));
@@ -46,5 +29,27 @@ public class DonutEncoderTest {
     assertEquals(1, v.norm(0), 1e-9);
     List<String> fields = Lists.newArrayList(onComma.split(lines.get(1)));
     assertEquals(Double.parseDouble(fields.get(1)), v.norm(1), 1e-9);
+  }
+
+  @Test
+  public void testAddToVector() throws IOException {
+    List<String> lines = Resources.readLines(Resources.getResource("donut.csv"), Charsets.UTF_8);
+    DonutEncoder encoder = new DonutEncoder(onComma.split(lines.get(0)), ImmutableList.<String>of("x", "y", "shape", "k"));
+    Vector v = new RandomAccessSparseVector(40);
+    assertEquals(0, v.norm(0), 1e-9);
+    encoder.addToVector(onComma.split(lines.get(1)), v);
+
+    // 4 fields, two of which have two probes by default gives 6 features barring collisions
+    assertEquals(6, v.norm(0), 1e-9);
+
+    // this happens to be where the x value goes
+    assertEquals(4.936827227473259, v.norm(1), 1e-9);
+
+    // in the second line, we see a different, known value
+    v = new RandomAccessSparseVector(40);
+    assertEquals(0, v.norm(0), 1e-9);
+    encoder.addToVector(onComma.split(lines.get(2)), v);
+    assertEquals(6, v.norm(0), 1e-9);
+    assertEquals(5.620153406634927, v.norm(1), 1e-9);
   }
 }

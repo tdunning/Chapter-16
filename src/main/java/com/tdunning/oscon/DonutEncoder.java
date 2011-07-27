@@ -24,7 +24,8 @@ public class DonutEncoder {
   private static final Map<String, FeatureVectorEncoder> encoderMap;
   static {
     ImmutableMap.Builder<String, FeatureVectorEncoder> builder = ImmutableMap.builder();
-    encoderMap = builder.put("x", new ContinuousValueEncoder("x"))
+    encoderMap = builder
+      .put("x", new ContinuousValueEncoder("x"))
       .put("y", new ContinuousValueEncoder("y"))
       .put("a", new ContinuousValueEncoder("a"))
       .put("b", new ContinuousValueEncoder("b"))
@@ -32,9 +33,11 @@ public class DonutEncoder {
       .put("xx", new ContinuousValueEncoder("xx"))
       .put("xy", new ContinuousValueEncoder("xy"))
       .put("yy", new ContinuousValueEncoder("yy"))
+
       .put("k", new StaticWordValueEncoder("k"))
       .put("k0", new StaticWordValueEncoder("k0"))
       .put("shape", new StaticWordValueEncoder("shape"))
+
       .put("bias", new ContinuousValueEncoder("bias"))
       .build();
   }
@@ -42,13 +45,18 @@ public class DonutEncoder {
   private int[] columns;
   private List<String> names;
 
-  public DonutEncoder(Iterable<String> names, Iterable<String> encodeThese) {
+  /**
+   * Provides a flexible CSV encoder for data such as the donut test data.
+   * @param columnNames   Names of the columns in the data
+   * @param encodeThese   Names of the columns we should encode
+   */
+  public DonutEncoder(Iterable<String> columnNames, Iterable<String> encodeThese) {
     Set<String> encodable = ImmutableSet.copyOf(encodeThese);
     columns = new int[encodable.size()];
     int i = 0;
     int column = 0;
-    this.names = Lists.newArrayList(names);
-    for (String name : this.names) {
+    names = Lists.newArrayList(columnNames);
+    for (String name : names) {
       if (encodable.contains(name)) {
         columns[i++] = column;
       }
@@ -56,6 +64,11 @@ public class DonutEncoder {
     }
   }
 
+  /**
+   * Adds encoded forms of the previously specified fields to a feature vector.
+   * @param values    The string values of all of the fields.
+   * @param v         The feature vector that should old the encoded values.
+   */
   public void addToVector(Iterable<String> values, Vector v) {
     int i = 0;
     int column = 0;
@@ -69,9 +82,5 @@ public class DonutEncoder {
       }
       column++;
     }
-  }
-
-  public int[] getColumns() {
-    return columns;
   }
 }
