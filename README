@@ -1,3 +1,7 @@
+# Warning
+This repository has been archived. No maintenance is being done and is not tracking security advisories.
+
+# README
 To use this example, you will need Java 6 and mvn to be installed already.  Open JDK is fine.
 
 0. Download, compile and install mahout libraries
